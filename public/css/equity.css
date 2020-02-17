@@ -1,34 +1,31 @@
-body {
-    background-color: black;
-}
 
 svg {
     border : 1px solid grey;
-    background-color: black;
     margin-top: 3%;
 }
 
 .axis-label{
     font-size: 20px;
      text-anchor: "middle";
-     fill : whitesmoke;
+     fill : grey;
 }
 
 .x.axis text{
     text-anchor: end;
     font-weight: bold;
     transform: rotate(-40deg);
-    fill: whitesmoke;
+    fill: grey;
 }
 
 .y.axis text{
     text-anchor: end;
-    fill: whitesmoke;
+    font-weight: bold;
+    fill: grey;
 }
 
 .companyDetails {
     font-weight: bold;
-    color: whitesmoke;
+    color: grey;
 }
 
 #chart-data {

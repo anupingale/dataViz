@@ -23,7 +23,7 @@ const drawBuildings = (buildings) => {
 
   const y = d3.scaleLinear()
     .domain([0, _.maxBy(buildings, "height").height])
-    .range([0, height]);
+    .range([height, 0]);
 
   const x = d3.scaleBand()
     .range([0, width])
@@ -35,17 +35,17 @@ const drawBuildings = (buildings) => {
   const yAxis = d3.axisLeft(y)
     .tickFormat((d) => d + "m")
     .ticks(3);
-    
+
   const xAxis = d3.axisBottom(x);
 
   svgGroup.append("text")
-    .attr("class", "axis-level")
+    .attr("class", "axis-label")
     .attr("x", width / 2)
     .attr("y", height + 140)
     .text((b) => "Tall buildings")
 
   svgGroup.append("text")
-    .attr("class", "axis-level")
+    .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
     .attr("y", -60)
@@ -64,10 +64,11 @@ const drawBuildings = (buildings) => {
 
   const newRectangles = rectangles.enter().append("rect");
 
-  newRectangles.attr("y", 0)
+  newRectangles.attr("y", b => y(b.height))
     .attr("x", (b, i) => x(b.name))
     .attr("width", x.bandwidth)
-    .attr("height", (b) => y(b.height));
+    .attr("height", (b) => y(0) - y(b.height))
+    .attr("fill","grey");
 }
 
 const main = () => {
