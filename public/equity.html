@@ -8,6 +8,11 @@
   <title>Buildings</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/equity.css">
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+
+  <script src="https://cdn.rawgit.com/RasmusFonseca/d3RangeSlider/master/d3RangeSlider.js"></script>
+  <link href="https://cdn.rawgit.com/RasmusFonseca/d3RangeSlider/master/d3RangeSlider.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -16,9 +21,14 @@
   <script src="js/equity.js"></script>
 
   <div class="container">
+    <div id="slider-container"></div>
+    <div class="box-container">
+      <div id="start-end-date"></div>
+      <input name="first-input" type="number" />
+      <input name="second-input" type="number" />
+    </div>
     <div class="row">
       <div id="chart-area" class="col-sm"></div>
-      <div id="chart-data" class="col-sm"></div>
     </div>
   </div>
 </body>

@@ -3,22 +3,23 @@ const margin = {
     left: 100, right: 10,
     top: 10, bottom: 150
 }
-const chartSize = { width: 800, height: 600 };
+const chartSize = { width: 1200, height: 600 };
 const width = chartSize.width - margin.left - margin.right;
 const height = chartSize.height - margin.top - margin.bottom;
 
-const updateChart = (prices) => {
+const updateChart = (quotes) => {
+
     const svg = d3.select('#chart-area svg');
-    const svgGroup = d3.select('.prices');
+    const svgGroup = d3.select('.quotes');
 
     const x = d3.scaleTime()
-        .domain([new Date(_.first(prices).Date), new Date(_.last(prices).Date)])
-        .range([0,width]);
+        .domain([_.first(quotes).Time, _.last(quotes).Time])
+        .range([0, width]);
 
     const xAxis = d3.axisBottom(x);
 
     const y = d3.scaleLinear()
-        .domain([_.minBy(prices,"Close").Close, _.maxBy(prices,"Close").Close])
+        .domain([_.minBy(quotes, "Close").Close, _.maxBy(quotes, "Close").Close])
         .range([height, 0]);
 
     const yAxis = d3.axisLeft(y)
@@ -28,6 +29,13 @@ const updateChart = (prices) => {
     svg.select('.y.axis-label').text("CLOSE");
     svg.select('.y.axis').call(yAxis);
     svg.select('.x.axis').call(xAxis);
+
+    const line = d3.line().x(q => x(q.Time)).y(q => y(q.Close));
+
+    const line1 = d3.line().x(q => x(q.Time)).y(q => y(q.SMA));
+
+    d3.select('.close').attr("d", line(quotes));
+    d3.select('.sma').attr("d", line1(quotes.slice(101)));
 }
 
 const initChart = function () {
@@ -37,7 +45,7 @@ const initChart = function () {
         .attr("height", chartSize.height);
 
     const svgGroup = svg.append("g")
-        .attr("class", "prices")
+        .attr("class", "quotes")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     const xAxisLabel = svgGroup.append("text")
@@ -64,19 +72,52 @@ const initChart = function () {
         .attr("transform", "rotate(-40)")
         .attr("x", -5)
         .attr("y", 10);
+
+    svgGroup.append("path")
+        .attr("class", "close");
+
+    svgGroup.append("path")
+        .attr("class", "sma");
+
 }
 
-const startVisualization = function (companyDetails) {
+const getAverage = function (data) {
+    let sum = 0;
+    _.forEach(_.takeRight(data, 100), (obj => sum += obj.Close));
+    return sum / 100;
+}
+
+const analyseData = function (quotes) {
+    const data = quotes.slice(0);
+    while (data.length > 100) {
+        quotes[data.length - 1]["SMA"] = getAverage(data);
+        data.pop();
+    }
+    return quotes;
+}
+
+const startVisualization = function (niftyData) {
+    const analysedData = analyseData(niftyData);
     initChart();
-    updateChart(companyDetails, 0);
+    updateChart(analysedData);
+
+    document.querySelector('#start-end-date').innerHTML = `<div>${0} - ${analysedData.length-1}</div>`;
+
+    slider = createD3RangeSlider(0, analysedData.length-1, "#slider-container");
+    slider.onChange((newRange) => {
+        updateChart(analysedData.slice(newRange.begin, newRange.end));
+        document.querySelector('#start-end-date').innerHTML = `<div>${newRange.begin} - ${newRange.end}</div>`;
+    }
+    );
 }
 
 const parseCompany = function ({ AdjClose, Volume, Date, ...rest }) {
     _.forEach(rest, (v, k) => rest[k] = +v);
-    return { Date, ...rest };
+    return { Date, Time: new window.Date(Date), ...rest };
 }
 
 const main = () => {
+
     d3.csv("/data/Nifty.csv", parseCompany).then(startVisualization);
 }
 

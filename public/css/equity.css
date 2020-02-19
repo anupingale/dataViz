@@ -31,6 +31,33 @@ svg {
 #chart-data {
     display: flex;
     justify-content: center;
-    flex-direction: column;
-   
+    flex-direction: column;  
+}
+
+.close {
+    fill:none;
+    stroke: black;
+    stroke-width: 2px;
+}
+
+.sma {
+    fill:none;
+    stroke: blue;
+    stroke-width: 2px;
+}
+
+#slider-container {
+    position: relative;
+    height:30px;
+    width: 1200px;
+    margin :10px 0;
+}
+
+.box-container {
+    display: flex;
+    justify-items: center;
+}
+
+.box-container input {
+   margin-left: 20px;
 }
