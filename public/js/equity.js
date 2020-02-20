@@ -18,8 +18,13 @@ const updateChart = (quotes) => {
 
     const xAxis = d3.axisBottom(x);
 
+    const minClose = _.minBy(quotes, "Close").Close;
+    const maxClose = _.maxBy(quotes, "Close").Close;
+    const minSma = _.minBy(quotes, "SMA").SMA;
+    const maxSma = _.maxBy(quotes, "SMA").SMA;
+
     const y = d3.scaleLinear()
-        .domain([_.minBy(quotes, "Close").Close, _.maxBy(quotes, "Close").Close])
+        .domain([_.min([minClose,minSma]), _.max([maxClose,maxSma])])
         .range([height, 0]);
 
     const yAxis = d3.axisLeft(y)
@@ -35,7 +40,7 @@ const updateChart = (quotes) => {
     const line1 = d3.line().x(q => x(q.Time)).y(q => y(q.SMA));
 
     d3.select('.close').attr("d", line(quotes));
-    d3.select('.sma').attr("d", line1(quotes.slice(101)));
+    d3.select('.sma').attr("d", line1(_.filter(quotes, "SMA")));
 }
 
 const initChart = function () {
@@ -101,9 +106,10 @@ const startVisualization = function (niftyData) {
     initChart();
     updateChart(analysedData);
 
-    document.querySelector('#start-end-date').innerHTML = `<div>${0} - ${analysedData.length-1}</div>`;
+    document.querySelector('#start-end-date').innerHTML = `<div>${0} - ${analysedData.length - 1}</div>`;
 
-    slider = createD3RangeSlider(0, analysedData.length-1, "#slider-container");
+    slider = createD3RangeSlider(0, analysedData.length - 1, "#slider-container");
+    
     slider.onChange((newRange) => {
         updateChart(analysedData.slice(newRange.begin, newRange.end));
         document.querySelector('#start-end-date').innerHTML = `<div>${newRange.begin} - ${newRange.end}</div>`;
